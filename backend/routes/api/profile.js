@@ -10,7 +10,9 @@ const {
   updateProfileExperience,
   deleteProfileExperience,
   updateProfileEducation,
-  deleteProfileEducation
+  deleteProfileEducation,
+  updateProfileExperienceChecker,
+  updateProfileEducationChecker
 } = require('../../controller/profile.controller');
 const authentication = require('../../middleware/authentication');
 
@@ -21,14 +23,23 @@ const router = express.Router();
  * @desc    Create or update profile
  * @access  Private
  */
-router.post('/', authentication, createOrUpdateProfileChecker, createOrUpdateProfile);
+router.post(
+  '/',
+  authentication,
+  createOrUpdateProfileChecker,
+  createOrUpdateProfile
+);
 
 /**
  * @route   GET api/profle/me
  * @desc    Get my profile
  * @access  Private
  */
-router.get('/me', authentication, getMyProfile);
+router.get(
+  '/me',
+  authentication,
+  getMyProfile
+);
 
 /**
  * @route   GET api/profile
@@ -49,14 +60,23 @@ router.get('/user', getUserProfileByID);
  * @desc    Delete profile, user & posts
  * @access  Private
  */
-router.delete('/', authentication, deleteUserProfile);
+router.delete(
+  '/',
+  authentication,
+  deleteUserProfile
+);
 
 /**
  * @route   PUT api/profile/experience
  * @desc    Update profile's experience
  * @access  Private
  */
-router.put('/experience', authentication, updateProfileExperience);
+router.put(
+  '/experience',
+  authentication,
+  updateProfileExperienceChecker,
+  updateProfileExperience
+);
 
 
 /**
@@ -64,20 +84,33 @@ router.put('/experience', authentication, updateProfileExperience);
  * @desc    Delete experience from profile
  * @access  Private
  */
-router.delete('/experience', authentication, deleteProfileExperience);
+router.delete(
+  '/experience',
+  authentication,
+  deleteProfileExperience
+);
 
 /**
  * @route   PUT api/profile/education
  * @desc    Update profile's education
  * @access  Private
  */
-router.put('/education', authentication, updateProfileEducation);
+router.put(
+  '/education',
+  authentication,
+  updateProfileEducationChecker,
+  updateProfileEducation
+);
 
 /**
  * @route   DELETE api/profile/education?edu_id
  * @desc    Delete education from profile
  * @access  Private
  */
-router.delete('/education', authentication, deleteProfileEducation);
+router.delete(
+  '/education',
+  authentication,
+  deleteProfileEducation
+);
 
 module.exports = router;

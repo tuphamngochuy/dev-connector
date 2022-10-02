@@ -1,5 +1,4 @@
 const { check, validationResult } = require('express-validator');
-const { findOne } = require('../models/Profile');
 
 const Profile = require('../models/Profile');
 const User = require('../models/User');
@@ -142,6 +141,12 @@ exports.deleteUserProfile = async (req, res) => {
   }
 }
 
+exports.updateProfileExperienceChecker = [
+  check('title', 'Title is required').not().isEmpty(),
+  check('company', 'Company is required').not().isEmpty(),
+  check('from', 'Start date is required').not().isEmpty(),
+]
+
 /**
  * Update ONE experience in user's profile
  * @param { HttpRequest } req 
@@ -208,6 +213,13 @@ exports.deleteProfileExperience = async (req, res) => {
     res.status(500).json('Server Error');
   }
 }
+
+exports.updateProfileEducationChecker = [
+  check('school', 'School is required').not().isEmpty(),
+  check('degree', 'Degree is required').not().isEmpty(),
+  check('fieldofstudy', 'Field of study is required').not().isEmpty(),
+  check('from', 'Start date is required').not().isEmpty(),
+]
 
 /**
  * Update ONE education in user's profile
