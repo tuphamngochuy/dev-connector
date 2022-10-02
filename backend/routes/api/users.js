@@ -1,6 +1,6 @@
 const express = require('express');
 
-const UsersController = require('../../controller/users.controller');
+const { register, registerChecker } = require('../../controller/users.controller');
 
 const router = express.Router();
 
@@ -9,6 +9,6 @@ const router = express.Router();
  * @desc    Register new user
  * @access  PUBLIC
  */
-router.post('/', UsersController.register);
+router.post('/', registerChecker, register);
 
 module.exports = router;
