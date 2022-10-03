@@ -79,6 +79,11 @@ exports.createOrUpdateProfile = async (req, res) => {
 exports.getMyProfile = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
+
+    if (!profile) {
+      res.status(401).json({ msg: 'Profile is not existed' });
+    }
+
     res.json(profile);
   } catch (err) {
     console.error(err.message);
@@ -109,6 +114,11 @@ exports.getAllProfile = async (req, res) => {
 exports.getUserProfileByID = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.query.user_id });
+
+    if (!profile) {
+      return res.status(400).json({ msg: 'User do not have profile before' });
+    }
+
     res.json(profile);
   } catch (err) {
     console.error(err.message);
@@ -153,7 +163,13 @@ exports.updateProfileExperienceChecker = [
  * @param { HttpResponse } res 
  */
 exports.updateProfileExperience = async (req, res) => {
-  const {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  let {
     title,
     company,
     location,
@@ -163,11 +179,6 @@ exports.updateProfileExperience = async (req, res) => {
     description
   } = req.body;
 
-  //If user don't provide the end day of experience, this is the current job
-  if (!to) {
-    to = Date.now;
-    current = true;
-  }
 
   const newExp = {
     title,
@@ -181,13 +192,18 @@ exports.updateProfileExperience = async (req, res) => {
 
   try {
     const profile = await Profile.findOne({ user: req.user.id });
+
+    if (!profile) {
+      return res.status(400).json({ msg: 'User do not have profile before' });
+    }
+
     profile.experience.unshift(newExp);
     profile.save();
 
     res.json(profile);
   } catch (err) {
     console.error(err.message);
-    res.status(500).json('Server Error');
+    res.status(500).json({ msg: 'Server Error' });
   }
 }
 
@@ -199,9 +215,18 @@ exports.updateProfileExperience = async (req, res) => {
 exports.deleteProfileExperience = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
+
+    if (!profile) {
+      return res.status(400).json({ msg: 'User do not have profile before' });
+    }
+
     const removeIndex = profile.experience
       .map(item => item.id)
       .indexOf(req.query.exp_id);
+
+    if (removeIndex < 0) {
+      return res.status(400).json({ msg: 'Experience is unvalid' });
+    }
 
     profile.experience.splice(removeIndex, 1);
 
@@ -227,6 +252,12 @@ exports.updateProfileEducationChecker = [
  * @param { HttpResponse } res 
  */
  exports.updateProfileEducation = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const {
     school,
     degree,
@@ -236,12 +267,6 @@ exports.updateProfileEducationChecker = [
     current,
     description
   } = req.body;
-
-  //If user don't provide the end day of education, this is the current education
-  if (!to) {
-    to = Date.now;
-    current = true;
-  }
 
   const newEdu = {
     school,
@@ -255,6 +280,11 @@ exports.updateProfileEducationChecker = [
 
   try {
     const profile = await Profile.findOne({ user: req.user.id });
+
+    if (!profile) {
+      return res.status(400).json({ msg: 'User do not have profile before' });
+    }
+
     profile.education.unshift(newEdu);
     profile.save();
 
@@ -273,9 +303,18 @@ exports.updateProfileEducationChecker = [
 exports.deleteProfileEducation = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
+
+    if (!profile) {
+      return res.status(400).json({ msg: 'User do not have profile before' });
+    }
+
     const removeIndex = profile.education
       .map(item => item.id)
       .indexOf(req.query.edu_id);
+
+    if (removeIndex < 0) {
+      return res.status(400).json({ msg: 'Experience is unvalid' });
+    }
 
     profile.education.splice(removeIndex, 1);
 
