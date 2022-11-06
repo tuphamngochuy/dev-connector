@@ -1,4 +1,4 @@
 {
-  "mongoURI": "mongodb+srv://ngochuytp:HuyTu0601@cluster-devconnector.bzsddlf.mongodb.net/?retryWrites=true&w=majority",
+  "mongoURI": "mongodb+srv://huytu:HuyTu0601@cluster0.rblibf6.mongodb.net/?retryWrites=true&w=majority",
   "jwtSecret": "mySecret"
 } 

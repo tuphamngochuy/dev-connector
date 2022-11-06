@@ -78,7 +78,6 @@ exports.getPostByID = async (req, res) => {
     const postID = mongoose.Types.ObjectId(req.query.post_id);
     const post = await Post.findById(postID);
     
-    //TODO: Check object existence before response
     if (!post) {
       return res.status(400).json({ msg: 'Post is not existed' });
     }     
@@ -242,7 +241,6 @@ exports.commentAPost = async (req, res) => {
  */
 exports.uncommentAPost = async (req, res) => {
   try {
-    console.log("---req", req.query);
     const postID = mongoose.Types.ObjectId(req.query.post_id);
     const post = await Post.findById(postID);
 

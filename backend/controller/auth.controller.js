@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 const User = require("../models/User");
+const { default: mongoose } = require('mongoose');
 
 /**
  * GET api/auth controller
@@ -12,7 +13,11 @@ const User = require("../models/User");
  */
 exports.getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(mongoose.Types.ObjectId(req.user.id)).select('-password');
+
+    if (!user) {
+      return res.status(303).json({ msg: 'User not found' });
+    }
 
     res.json(user);
   } catch (err) {
@@ -44,11 +49,11 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ errors: [{ msg: 'Email is incorrect' }] });
+      return res.status(401).json({ errors: [{ msg: 'Email is incorrect' }] });
     }
-
-    if (!bcrypt.compare(password, user.password)) {
-      return res.status(400).json({ errors: [{ msg: 'Invalid password' }] });
+    
+    if (!bcrypt.compareSync(password, user.password)) {
+      return res.status(401).json({ errors: [{ msg: 'Invalid password' }] });
     }
 
     const payload = {
@@ -60,7 +65,6 @@ exports.login = async (req, res) => {
     jwt.sign(
       payload,
       config.get('jwtSecret'),
-      { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
 

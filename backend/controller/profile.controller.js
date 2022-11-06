@@ -1,4 +1,5 @@
 const { check, validationResult } = require('express-validator');
+const { default: mongoose } = require('mongoose');
 
 const Profile = require('../models/Profile');
 const User = require('../models/User');
@@ -50,7 +51,7 @@ exports.createOrUpdateProfile = async (req, res) => {
   }
 
   try {
-    let profile = await Profile.findOne({ user: req.user.id });
+    let profile = await Profile.findOne({ user: req.user.id});
 
     if (profile) {
       profile = await Profile.findOneAndUpdate(
@@ -78,10 +79,10 @@ exports.createOrUpdateProfile = async (req, res) => {
  */
 exports.getMyProfile = async (req, res) => {
   try {
-    const profile = await Profile.findOne({ user: req.user.id });
+    const profile = await Profile.findOne({ user: req.user.id});
 
     if (!profile) {
-      res.status(401).json({ msg: 'Profile is not existed' });
+      return res.status(303).json({ msg: 'Profile is not existed' });
     }
 
     res.json(profile);
@@ -98,7 +99,14 @@ exports.getMyProfile = async (req, res) => {
  */
 exports.getAllProfile = async (req, res) => {
   try {
-    const profiles = await Profile.find().select('user').populate('user', ['name', 'avatar']);
+    const profiles = await Profile
+      .find()
+      .select('user')
+      .populate('user', ['name', 'avatar'])
+      .select('company')
+      .select('location')
+      .select('skills');
+    
     res.json(profiles);
   } catch (err) {
     console.error(err.message);
@@ -112,8 +120,19 @@ exports.getAllProfile = async (req, res) => {
  * @param { HttpResponse } res 
  */
 exports.getUserProfileByID = async (req, res) => {
+
   try {
-    const profile = await Profile.findOne({ user: req.query.user_id });
+    const profile = await Profile
+      .findById(mongoose.Types.ObjectId(req.query.user_id))
+      .select('user')
+      .populate('user', ['name', 'avatar'])
+      .select('company')
+      .select('location')
+      .select('skills')
+      .select('experience')
+      .select('education')
+      .select('bio')
+      .select('social');
 
     if (!profile) {
       return res.status(400).json({ msg: 'User do not have profile before' });
@@ -141,7 +160,7 @@ exports.deleteUserProfile = async (req, res) => {
 
     //TODO: Remove posts
     /** Code here */
-
+    
     /** */
 
     res.json('User deleted');
@@ -193,12 +212,13 @@ exports.updateProfileExperience = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
 
+
     if (!profile) {
       return res.status(400).json({ msg: 'User do not have profile before' });
     }
 
     profile.experience.unshift(newExp);
-    profile.save();
+    await profile.save();
 
     res.json(profile);
   } catch (err) {

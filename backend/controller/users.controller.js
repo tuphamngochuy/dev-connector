@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
     let user = await User.findOne({ email });
 
     if (user) {
-      res.status(400).json({ errors: [{ msg: 'User is already exists' }] });
+      return res.status(303).json({ errors: [{ error: 'User is already exists' }] });
     }
 
     const avatar = gravatar.url(email, {
@@ -64,7 +64,6 @@ exports.register = async (req, res) => {
     jwt.sign(
       payload,
       config.get('jwtSecret'),
-      { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
 
